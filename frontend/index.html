@@ -14,18 +14,22 @@
       max-width: 1200px;
       margin: auto;
     }
+
     h1, h2 {
       text-align: center;
     }
+
     .section {
       margin-bottom: 2rem;
     }
+
     .kpis {
       display: flex;
       flex-wrap: wrap;
       justify-content: center;
       gap: 1rem;
     }
+
     .card {
       background: white;
       padding: 1rem 1.5rem;
@@ -35,54 +39,7 @@
       min-width: 200px;
       text-align: center;
     }
-    canvas {
-      background: white;
-      padding: 1rem;
-      border-radius: 8px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-      max-width: 100%;
-      margin: auto;
-      display: block;
-    }
-    .ab-card {
-      white-space: pre-wrap;
-      background: #e0f2fe;
-      padding: 1rem;
-      border-radius: 5px;
-      font-family: monospace;
-      width: 100%;
-    }
-    .recommendations {
-      background: #fef9c3;
-      border-left: 4px solid #facc15;
-      padding: 1rem;
-      border-radius: 6px;
-      list-style: disc inside;
-      font-size: 1rem;
-    }
-    .recommendations li {
-      margin-bottom: 0.5rem;
-    }
-    .dual-charts {
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: center;
-      gap: 2rem;
-    }
-    .chart-box {
-      flex: 1;
-      min-width: 300px;
-      max-width: 48%;
-    }
-    .horizontal-split {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 2rem;
-    }
-    .half-box {
-      flex: 1;
-      min-width: 300px;
-    }
+
     details.info-box {
       background: #f1f5f9;
       padding: 1rem;
@@ -92,12 +49,48 @@
       max-width: 800px;
       margin: 0 auto 2rem auto;
     }
+
+    .charts-row {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 2rem;
+    }
+
+    canvas {
+      background: white;
+      padding: 1rem;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+      width: 100%;
+      max-width: 550px;
+    }
+
+    .bottom-row {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 2rem;
+      margin-top: 2rem;
+    }
+
+    .ab-card, .recommendations {
+      white-space: pre-wrap;
+      background: #e0f2fe;
+      padding: 1rem;
+      border-radius: 5px;
+      font-family: monospace;
+      flex: 1;
+      min-width: 300px;
+    }
+
     select {
       display: block;
       margin: 1rem auto 2rem auto;
       padding: 0.5rem;
       font-size: 1rem;
     }
+
     footer {
       text-align: center;
       font-size: 0.85rem;
@@ -112,8 +105,9 @@
 
   <details class="info-box">
     <summary><strong>📘 Campaign Details</strong></summary>
-    <p><strong>Campaign A</strong>: Running Shoes (🎥 Video Ad)</p>
-    <p><strong>Campaign B</strong>: Winter Boots (🖼️ Carousel Ad)</p>
+    <p><strong>Campaign A</strong>: Running Shoes</p>
+    <p><strong>Campaign B</strong>: Winter Boots</p>
+    <p>Ad Types: Variant A = 🎥 Video Ad, Variant B = 🖼️ Static/Carousel Ad</p>
   </details>
 
   <div class="section">
@@ -131,28 +125,28 @@
     <div class="card"><h3>Total Revenue</h3><p id="totalRevenue">Loading...</p></div>
   </div>
 
-  <div class="section dual-charts">
-    <div class="chart-box">
-      <h2>📈 Forecasted Conversions</h2>
-      <p style="text-align:center;">Predicted daily conversions over the next 7 days</p>
+  <div class="section charts-row">
+    <div>
+      <h2 style="text-align:center;">📈 Forecasted Conversions</h2>
       <canvas id="forecastChart" height="300"></canvas>
     </div>
-    <div class="chart-box">
-      <h2>💰 Shopify Revenue by Product</h2>
+    <div>
+      <h2 style="text-align:center;">💰 Shopify Revenue by Product</h2>
       <canvas id="revenueChart" height="300"></canvas>
     </div>
   </div>
 
-  <div class="section horizontal-split">
-    <div class="half-box">
-      <h2>🧪 A/B Test Results</h2>
-      <div id="abTestResults" class="ab-card">Loading...</div>
+  <div class="bottom-row">
+    <div style="flex: 1; min-width: 300px;">
+      <h2 style="text-align: center;"> A/B Test Results</h2>
+      <div class="ab-card" id="abTestResults">Loading...</div>
     </div>
-    <div class="half-box">
-      <h2>💡 Recommendations</h2>
-      <ul id="recommendationsList" class="recommendations">Loading...</ul>
+    <div style="flex: 1; min-width: 300px;">
+      <h2 style="text-align: center;"> Recommendations</h2>
+      <ul class="recommendations" id="recommendationsList">Loading...</ul>
     </div>
   </div>
+  
 
   <footer>
     Powered by Prophet + z-tests. Auto-refresh every 10s. Customize with Slack alerts, CSV export, and more!
@@ -169,13 +163,10 @@
           document.getElementById("totalSpend").textContent = "$" + data.meta_summary.reduce((a, b) => a + b.spend, 0).toFixed(2);
           document.getElementById("totalRevenue").textContent = "$" + data.shopify_summary.reduce((a, b) => a + b.revenue, 0).toFixed(2);
 
-          const recList = document.getElementById("recommendationsList");
-          if (recList && data.recommendations) {
-            recList.innerHTML = data.recommendations.map(r => `<li>${r}</li>`).join("");
-          }
-
           const canvas = document.getElementById("revenueChart");
+          if (!canvas) return;
           const ctx = canvas.getContext("2d");
+
           const labels = data.shopify_summary.map(p => p.product);
           const values = data.shopify_summary.map(p => p.revenue);
 
@@ -211,12 +202,18 @@
               }
             });
           }
+
+          const recList = document.getElementById("recommendationsList");
+          recList.innerHTML = data.recommendations && data.recommendations.length > 0
+            ? data.recommendations.map(r => `<li>${r}</li>`).join("")
+            : "<li>No recommendations available.</li>";
         })
         .catch(() => console.error("⚠️ Insights fetch failed"));
     }
 
     function fetchForecast(campaign = "all") {
       const canvas = document.getElementById("forecastChart");
+      if (!canvas) return;
       const ctx = canvas.getContext("2d");
 
       fetch(`${base}/api/forecast?campaign=${campaign}`)
@@ -286,19 +283,17 @@
 
     function updateDashboard() {
       const selected = document.getElementById("campaignSelect").value;
+      fetchInsights();
       fetchForecast(selected);
       fetchAbTest(selected);
     }
 
     document.addEventListener("DOMContentLoaded", () => {
-      fetchInsights();
       updateDashboard();
       document.getElementById("campaignSelect").addEventListener("change", updateDashboard);
-      setInterval(() => {
-        fetchInsights();
-        updateDashboard();
-      }, 10000);
+      setInterval(updateDashboard, 10000); // refresh every 10s
     });
   </script>
+
 </body>
 </html>

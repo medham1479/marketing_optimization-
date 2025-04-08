@@ -1,67 +1,62 @@
 import pandas as pd
 
 def generate_insights(meta_data, shopify_data):
-    meta_df = pd.DataFrame(meta_data)
-    shopify_df = pd.DataFrame(shopify_data)
+    df = pd.DataFrame(meta_data)
 
-    # Calculate basic KPIs
-    total_spend = meta_df["spend"].sum()
-    total_revenue = shopify_df["revenue"].sum()
-    roi = total_revenue / total_spend if total_spend else 0
+    df["ctr"] = df["clicks"] / df["impressions"]
+    df["cpc"] = df["spend"] / df["clicks"]
+    df["conversion_rate"] = df["conversions"] / df["clicks"]
+    df["roi"] = (df["conversions"] * 30 - df["spend"]) / df["spend"]  
 
-    # Predictive budgeting suggestions (mock logic)
-    budget_suggestions = []
-    for spend in [100, 300, 500, 800, 1000]:
-        predicted_conversions = int(spend * roi * 0.1)
-        predicted_roi = (predicted_conversions * 10 - spend) / spend * 100
-        budget_suggestions.append({
-            "spend": spend,
-            "predicted_conversions": predicted_conversions,
-            "predicted_roi": round(predicted_roi, 2)
-        })
+    summary = df.groupby("variant").agg({
+        "ctr": "mean",
+        "cpc": "mean",
+        "conversion_rate": "mean",
+        "roi": "mean"
+    }).reset_index()
 
-    # Group Shopify summary by product
-    shopify_summary = (
-        shopify_df.groupby("product")
-        .agg({"revenue": "sum", "sales": "sum"})
-        .reset_index()
-        .to_dict(orient="records")
-    )
-
-    # Group Meta summary by campaign
-    meta_summary = (
-        meta_df[["campaign", "date", "impressions", "clicks", "conversions", "spend", "variant"]]
-        .to_dict(orient="records")
-    )
-
-    # Automated recommendations
-    recommendations = []
-    avg_ctr = (meta_df["clicks"] / meta_df["impressions"]).mean()
-    if avg_ctr < 0.05:
-        recommendations.append("⚠️ CTR is low. Consider refreshing your creative.")
-    else:
-        recommendations.append("✅ CTR is healthy. Keep testing high-performing variants.")
-
-    # Generate A/B test trends over time
-    ab_trend_df = (
-        meta_df.groupby(["date", "variant"])
-        .agg({"clicks": "sum", "impressions": "sum"})
-        .reset_index()
-    )
-    ab_trend_df["ctr"] = ab_trend_df["clicks"] / ab_trend_df["impressions"]
-
-    # Pivot to get A and B in same row
-    ab_trend_pivot = ab_trend_df.pivot(index="date", columns="variant", values="ctr").reset_index()
-    ab_trend_pivot.columns.name = None
-    ab_trend_pivot = ab_trend_pivot.rename(columns={"A": "ctr_A", "B": "ctr_B"})
-
-    ab_trends = ab_trend_pivot.fillna(0).to_dict(orient="records")
+    recommendations = generate_recommendations(summary)
 
     return {
-        "roi": round(roi, 2),
-        "budget_suggestions": budget_suggestions,
-        "shopify_summary": shopify_summary,
-        "meta_summary": meta_summary,
-        "recommendations": recommendations,
-        "ab_trends": ab_trends
+        "roi": df["roi"].mean(),
+        "meta_summary": df.to_dict(orient="records"),
+        "shopify_summary": shopify_data,
+        "budget_suggestions": [], # Placeholder for budget suggestions
+        "recommendations": recommendations
     }
+
+
+def generate_recommendations(summary_df):
+    recs = []
+
+    try:
+        variant_a = summary_df[summary_df["variant"] == "A"].iloc[0]
+        variant_b = summary_df[summary_df["variant"] == "B"].iloc[0]
+    except IndexError:
+        return ["Insufficient data to compare A/B variants."]
+
+    if variant_a["ctr"] > variant_b["ctr"] * 1.1:
+        recs.append("📈 Variant A has a significantly higher CTR. Prioritize Video Ads.")
+    elif variant_b["ctr"] > variant_a["ctr"] * 1.1:
+        recs.append("📈 Variant B is attracting more clicks. Test Carousel formats more.")
+
+    if variant_a["roi"] > variant_b["roi"] * 1.2:
+        recs.append("💰 Variant A has much better ROI. Allocate more spend to Campaign A.")
+    elif variant_b["roi"] > variant_a["roi"] * 1.2:
+        recs.append("💰 Variant B has better ROI. Shift budget to Campaign B.")
+
+    if variant_a["cpc"] < variant_b["cpc"]:
+        recs.append("🧾 CPC is lower for Variant A — it's more efficient at driving clicks.")
+    elif variant_b["cpc"] < variant_a["cpc"]:
+        recs.append("🧾 CPC is lower for Variant B — optimize creatives for better cost control.")
+
+    if variant_a["conversion_rate"] > variant_b["conversion_rate"] * 1.1:
+        recs.append("⚡ Variant A converts better — target similar audiences.")
+    elif variant_b["conversion_rate"] > variant_a["conversion_rate"] * 1.1:
+        recs.append("⚡ Variant B is converting better — optimize landing pages accordingly.")
+
+    if not recs:
+        recs.append("🔄 Performance is similar between A and B. Continue monitoring.")
+
+    return recs
+
