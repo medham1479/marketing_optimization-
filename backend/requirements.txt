@@ -2,3 +2,6 @@ Flask
 flask-cors
 pandas
 scikit-learn
+prophet
+statsmodels
+plotly

@@ -1,11 +1,11 @@
-# Use official Nginx image
+# Use official lightweight nginx image
 FROM nginx:alpine
 
-# Remove default nginx index page
+# Remove default nginx HTML
 RUN rm -rf /usr/share/nginx/html/*
 
-# Copy your static files into the container
+# Copy your static frontend into nginx web root
 COPY index.html /usr/share/nginx/html/
 
-# Expose port 80 for Docker Compose
+# Expose the default web port
 EXPOSE 80

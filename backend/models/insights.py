@@ -1,38 +1,67 @@
 import pandas as pd
-from sklearn.linear_model import LinearRegression
 
 def generate_insights(meta_data, shopify_data):
-    total_spend = sum(d['spend'] for d in meta_data)
-    total_revenue = sum(d['revenue'] for d in shopify_data)
+    meta_df = pd.DataFrame(meta_data)
+    shopify_df = pd.DataFrame(shopify_data)
+
+    # Calculate basic KPIs
+    total_spend = meta_df["spend"].sum()
+    total_revenue = shopify_df["revenue"].sum()
     roi = total_revenue / total_spend if total_spend else 0
 
-    df = pd.DataFrame(meta_data)
-    df['ctr'] = df['clicks'] / df['impressions']
-    df['cvr'] = df['conversions'] / df['clicks']
-    df.fillna(0, inplace=True)
+    # Predictive budgeting suggestions (mock logic)
+    budget_suggestions = []
+    for spend in [100, 300, 500, 800, 1000]:
+        predicted_conversions = int(spend * roi * 0.1)
+        predicted_roi = (predicted_conversions * 10 - spend) / spend * 100
+        budget_suggestions.append({
+            "spend": spend,
+            "predicted_conversions": predicted_conversions,
+            "predicted_roi": round(predicted_roi, 2)
+        })
 
-    model = LinearRegression()
-    model.fit(df[['spend', 'ctr', 'cvr']], df['conversions'])
+    # Group Shopify summary by product
+    shopify_summary = (
+        shopify_df.groupby("product")
+        .agg({"revenue": "sum", "sales": "sum"})
+        .reset_index()
+        .to_dict(orient="records")
+    )
 
-    # Predict for different spend scenarios
-    test_spend = [100, 300, 500, 800, 1000]
-    test_df = pd.DataFrame({
-        'spend': test_spend,
-        'ctr': [0.08] * len(test_spend),
-        'cvr': [0.05] * len(test_spend)
-    })
-    preds = model.predict(test_df)
-    roi_preds = [round((p * 100) / s, 2) for p, s in zip(preds, test_spend)]
+    # Group Meta summary by campaign
+    meta_summary = (
+        meta_df[["campaign", "date", "impressions", "clicks", "conversions", "spend", "variant"]]
+        .to_dict(orient="records")
+    )
 
-    budget_suggestions = [
-        {'spend': s, 'predicted_conversions': int(p), 'predicted_roi': r}
-        for s, p, r in zip(test_spend, preds, roi_preds)
-    ]
+    # Automated recommendations
+    recommendations = []
+    avg_ctr = (meta_df["clicks"] / meta_df["impressions"]).mean()
+    if avg_ctr < 0.05:
+        recommendations.append("⚠️ CTR is low. Consider refreshing your creative.")
+    else:
+        recommendations.append("✅ CTR is healthy. Keep testing high-performing variants.")
+
+    # Generate A/B test trends over time
+    ab_trend_df = (
+        meta_df.groupby(["date", "variant"])
+        .agg({"clicks": "sum", "impressions": "sum"})
+        .reset_index()
+    )
+    ab_trend_df["ctr"] = ab_trend_df["clicks"] / ab_trend_df["impressions"]
+
+    # Pivot to get A and B in same row
+    ab_trend_pivot = ab_trend_df.pivot(index="date", columns="variant", values="ctr").reset_index()
+    ab_trend_pivot.columns.name = None
+    ab_trend_pivot = ab_trend_pivot.rename(columns={"A": "ctr_A", "B": "ctr_B"})
+
+    ab_trends = ab_trend_pivot.fillna(0).to_dict(orient="records")
 
     return {
-        'meta_summary': meta_data,
-        'shopify_summary': shopify_data,
-        'roi': round(roi, 2),
-        'recommendations': ['Focus budget on high-performing creatives with better CTR.'],
-        'budget_suggestions': budget_suggestions
+        "roi": round(roi, 2),
+        "budget_suggestions": budget_suggestions,
+        "shopify_summary": shopify_summary,
+        "meta_summary": meta_summary,
+        "recommendations": recommendations,
+        "ab_trends": ab_trends
     }

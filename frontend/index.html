@@ -2,148 +2,303 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
+  <title>Marketing Optimization Dashboard</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Marketing Insights Dashboard</title>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
     body {
       font-family: 'Segoe UI', sans-serif;
-      background-color: #f8f9fa;
+      background: #f9fafb;
+      color: #1f2937;
       padding: 2rem;
-      color: #333;
+      max-width: 1200px;
+      margin: auto;
     }
-    h1 {
+    h1, h2 {
       text-align: center;
-      margin-bottom: 1rem;
     }
-    .metrics {
+    .section {
+      margin-bottom: 2rem;
+    }
+    .kpis {
       display: flex;
-      justify-content: space-around;
-      margin: 2rem 0;
       flex-wrap: wrap;
+      justify-content: center;
       gap: 1rem;
     }
     .card {
-      background-color: #fff;
-      padding: 1rem;
-      border-radius: 6px;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-      min-width: 150px;
-      text-align: center;
+      background: white;
+      padding: 1rem 1.5rem;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
       flex: 1;
+      min-width: 200px;
+      text-align: center;
     }
     canvas {
-      background-color: #fff;
+      background: white;
+      padding: 1rem;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+      max-width: 100%;
+      margin: auto;
+      display: block;
+    }
+    .ab-card {
+      white-space: pre-wrap;
+      background: #e0f2fe;
+      padding: 1rem;
+      border-radius: 5px;
+      font-family: monospace;
+      width: 100%;
+    }
+    .recommendations {
+      background: #fef9c3;
+      border-left: 4px solid #facc15;
       padding: 1rem;
       border-radius: 6px;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-      margin-bottom: 2rem;
+      list-style: disc inside;
+      font-size: 1rem;
     }
-    #recommendations {
-      margin-top: 2rem;
+    .recommendations li {
+      margin-bottom: 0.5rem;
+    }
+    .dual-charts {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 2rem;
+    }
+    .chart-box {
+      flex: 1;
+      min-width: 300px;
+      max-width: 48%;
+    }
+    .horizontal-split {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 2rem;
+    }
+    .half-box {
+      flex: 1;
+      min-width: 300px;
+    }
+    details.info-box {
+      background: #f1f5f9;
+      padding: 1rem;
+      border-left: 4px solid #38bdf8;
+      border-radius: 5px;
+      font-size: 0.95rem;
+      max-width: 800px;
+      margin: 0 auto 2rem auto;
+    }
+    select {
+      display: block;
+      margin: 1rem auto 2rem auto;
+      padding: 0.5rem;
+      font-size: 1rem;
+    }
+    footer {
+      text-align: center;
+      font-size: 0.85rem;
+      color: #6b7280;
+      margin-top: 3rem;
     }
   </style>
 </head>
 <body>
 
-  <h1>📊 Marketing Optimization Dashboard</h1>
+  <h1>📊 AI Marketing Optimization Dashboard</h1>
 
-  <div class="metrics">
-    <div class="card">
-      <h3>Total ROI</h3>
-      <p id="totalRoi">Loading...</p>
+  <details class="info-box">
+    <summary><strong>📘 Campaign Details</strong></summary>
+    <p><strong>Campaign A</strong>: Running Shoes (🎥 Video Ad)</p>
+    <p><strong>Campaign B</strong>: Winter Boots (🖼️ Carousel Ad)</p>
+  </details>
+
+  <div class="section">
+    <h2>🎛️ Filter by Campaign</h2>
+    <select id="campaignSelect">
+      <option value="all">All Campaigns</option>
+      <option value="Campaign A">Campaign A</option>
+      <option value="Campaign B">Campaign B</option>
+    </select>
+  </div>
+
+  <div class="section kpis">
+    <div class="card"><h3>Total ROI</h3><p id="roi">Loading...</p></div>
+    <div class="card"><h3>Total Spend</h3><p id="totalSpend">Loading...</p></div>
+    <div class="card"><h3>Total Revenue</h3><p id="totalRevenue">Loading...</p></div>
+  </div>
+
+  <div class="section dual-charts">
+    <div class="chart-box">
+      <h2>📈 Forecasted Conversions</h2>
+      <p style="text-align:center;">Predicted daily conversions over the next 7 days</p>
+      <canvas id="forecastChart" height="300"></canvas>
     </div>
-    <div class="card">
-      <h3>Total Spend</h3>
-      <p id="totalSpend">Loading...</p>
-    </div>
-    <div class="card">
-      <h3>Total Revenue</h3>
-      <p id="totalRevenue">Loading...</p>
+    <div class="chart-box">
+      <h2>💰 Shopify Revenue by Product</h2>
+      <canvas id="revenueChart" height="300"></canvas>
     </div>
   </div>
 
-  <h2>📈 Predicted ROI by Budget</h2>
-  <canvas id="roiChart" width="800" height="400"></canvas>
-  
-j
-  <div id="recommendations">
-    <h2>💡 Recommendations</h2>
-    <ul id="recList">Loading...</ul>
+  <div class="section horizontal-split">
+    <div class="half-box">
+      <h2>🧪 A/B Test Results</h2>
+      <div id="abTestResults" class="ab-card">Loading...</div>
+    </div>
+    <div class="half-box">
+      <h2>💡 Recommendations</h2>
+      <ul id="recommendationsList" class="recommendations">Loading...</ul>
+    </div>
   </div>
+
+  <footer>
+    Powered by Prophet + z-tests. Auto-refresh every 10s. Customize with Slack alerts, CSV export, and more!
+  </footer>
 
   <script>
-    const backendBaseUrl = "http://localhost:8000";
-  
+    const base = "http://localhost:8000";
+
     function fetchInsights() {
-      fetch(`${backendBaseUrl}/api/insights`)
+      fetch(`${base}/api/insights`)
         .then(res => res.json())
-        .then(renderInsights)
-        .catch(err => {
-          console.error("Fetch error:", err);
-          document.getElementById('recList').innerHTML =
-            `<li style="color:red">Failed to load insights. Backend may not be running.</li>`;
-        });
-    }
-  
-    function renderInsights(data) {
-      const canvas = document.getElementById('roiChart');
-      if (!canvas) {
-        console.error("Canvas element with ID 'roiChart' not found.");
-        return;
-      }
-  
-      const ctx = canvas.getContext('2d');
-      if (!ctx) {
-        console.error("Unable to get canvas context for Chart.js.");
-        return;
-      }
-  
-      const labels = data.budget_suggestions.map(s => `$${s.spend}`);
-      const values = data.budget_suggestions.map(s => s.predicted_roi);
-  
-      // Create chart if not exists
-      if (typeof window.roiChart === 'undefined') {
-        window.roiChart = new Chart(ctx, {
-          type: 'bar',
-          data: {
-            labels: labels,
-            datasets: [{
-              label: 'Predicted ROI',
-              data: values,
-              backgroundColor: '#4e73df'
-            }]
-          },
-          options: {
-            responsive: true,
-            scales: {
-              y: {
-                beginAtZero: true,
-                title: { display: true, text: 'ROI' }
-              }
-            }
+        .then(data => {
+          document.getElementById("roi").textContent = data.roi.toFixed(2);
+          document.getElementById("totalSpend").textContent = "$" + data.meta_summary.reduce((a, b) => a + b.spend, 0).toFixed(2);
+          document.getElementById("totalRevenue").textContent = "$" + data.shopify_summary.reduce((a, b) => a + b.revenue, 0).toFixed(2);
+
+          const recList = document.getElementById("recommendationsList");
+          if (recList && data.recommendations) {
+            recList.innerHTML = data.recommendations.map(r => `<li>${r}</li>`).join("");
           }
-        });
-      } else {
-        // Update existing chart
-        window.roiChart.data.labels = labels;
-        window.roiChart.data.datasets[0].data = values;
-        window.roiChart.update();
-      }
-  
-      // Update KPI metrics
-      document.getElementById('totalRoi').textContent = data.roi.toFixed(2);
-      const totalSpend = data.meta_summary.reduce((a, b) => a + b.spend, 0);
-      const totalRevenue = data.shopify_summary.reduce((a, b) => a + b.revenue, 0);
-      document.getElementById('totalSpend').textContent = `$${totalSpend.toFixed(2)}`;
-      document.getElementById('totalRevenue').textContent = `$${totalRevenue.toFixed(2)}`;
-      document.getElementById('recList').innerHTML =
-        data.recommendations.map(r => `<li>${r}</li>`).join('');
+
+          const canvas = document.getElementById("revenueChart");
+          const ctx = canvas.getContext("2d");
+          const labels = data.shopify_summary.map(p => p.product);
+          const values = data.shopify_summary.map(p => p.revenue);
+
+          if (window.revenueChart && window.revenueChart.data) {
+            window.revenueChart.data.labels = labels;
+            window.revenueChart.data.datasets[0].data = values;
+            window.revenueChart.update();
+          } else {
+            window.revenueChart = new Chart(ctx, {
+              type: "bar",
+              data: {
+                labels,
+                datasets: [{
+                  label: "Revenue ($)",
+                  data: values,
+                  backgroundColor: "#34d399"
+                }]
+              },
+              options: {
+                responsive: true,
+                plugins: {
+                  title: {
+                    display: true,
+                    text: "Revenue by Product"
+                  }
+                },
+                scales: {
+                  y: {
+                    beginAtZero: true,
+                    title: { display: true, text: "Revenue ($)" }
+                  }
+                }
+              }
+            });
+          }
+        })
+        .catch(() => console.error("⚠️ Insights fetch failed"));
     }
-  
-    setInterval(fetchInsights, 10000); // auto-refresh
-    fetchInsights(); // initial load
+
+    function fetchForecast(campaign = "all") {
+      const canvas = document.getElementById("forecastChart");
+      const ctx = canvas.getContext("2d");
+
+      fetch(`${base}/api/forecast?campaign=${campaign}`)
+        .then(res => res.json())
+        .then(data => {
+          const labels = data.map(x => new Date(x.ds).toISOString().split("T")[0]);
+          const values = data.map(x => x.yhat);
+
+          if (window.forecastChart && window.forecastChart.data) {
+            window.forecastChart.data.labels = labels;
+            window.forecastChart.data.datasets[0].data = values;
+            window.forecastChart.update();
+          } else {
+            window.forecastChart = new Chart(ctx, {
+              type: "line",
+              data: {
+                labels,
+                datasets: [{
+                  label: "Predicted Conversions",
+                  data: values,
+                  borderColor: "#3b82f6",
+                  tension: 0.3
+                }]
+              },
+              options: {
+                responsive: true,
+                plugins: {
+                  title: {
+                    display: true,
+                    text: "Next 7 Days Forecast"
+                  }
+                }
+              }
+            });
+          }
+        })
+        .catch(() => console.error("⚠️ Forecast fetch failed"));
+    }
+
+    function fetchAbTest(campaign = "all") {
+      fetch(`${base}/api/abtest?campaign=${campaign}`)
+        .then(res => res.json())
+        .then(data => {
+          let html = "";
+          if (!data || !data.variant_stats || !Array.isArray(data.variant_stats)) {
+            html = "❌ No A/B test data available.";
+          } else {
+            data.variant_stats.forEach(v => {
+              const adType = v.variant === "A" ? "🎥 Video Ad" : (campaign === "Campaign B" ? "🖼️ Carousel Ad" : "🖼️ Static Image");
+              html += `
+🧪 Variant ${v.variant}
+- Format: ${adType}
+- Impressions: ${v.impressions}
+- Clicks: ${v.clicks}
+- Conversions: ${v.conversions}
+- CTR: ${(v.ctr * 100).toFixed(1)}%
+- Spend: $${v.spend.toFixed(2)}\n\n`;
+            });
+            html += `💡 Interpretation: ${data.interpretation}`;
+          }
+          document.getElementById("abTestResults").textContent = html;
+        })
+        .catch(() => {
+          document.getElementById("abTestResults").textContent = "❌ Error loading A/B test results.";
+        });
+    }
+
+    function updateDashboard() {
+      const selected = document.getElementById("campaignSelect").value;
+      fetchForecast(selected);
+      fetchAbTest(selected);
+    }
+
+    document.addEventListener("DOMContentLoaded", () => {
+      fetchInsights();
+      updateDashboard();
+      document.getElementById("campaignSelect").addEventListener("change", updateDashboard);
+      setInterval(() => {
+        fetchInsights();
+        updateDashboard();
+      }, 10000);
+    });
   </script>
-  
 </body>
 </html>
