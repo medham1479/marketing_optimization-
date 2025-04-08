@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Marketing Insights Dashboard</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background-color: #f8f9fa;
+      padding: 2rem;
+      color: #333;
+    }
+    h1 {
+      text-align: center;
+      margin-bottom: 1rem;
+    }
+    .metrics {
+      display: flex;
+      justify-content: space-around;
+      margin: 2rem 0;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+    .card {
+      background-color: #fff;
+      padding: 1rem;
+      border-radius: 6px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+      min-width: 150px;
+      text-align: center;
+      flex: 1;
+    }
+    canvas {
+      background-color: #fff;
+      padding: 1rem;
+      border-radius: 6px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+      margin-bottom: 2rem;
+    }
+    #recommendations {
+      margin-top: 2rem;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>📊 Marketing Optimization Dashboard</h1>
+
+  <div class="metrics">
+    <div class="card">
+      <h3>Total ROI</h3>
+      <p id="totalRoi">Loading...</p>
+    </div>
+    <div class="card">
+      <h3>Total Spend</h3>
+      <p id="totalSpend">Loading...</p>
+    </div>
+    <div class="card">
+      <h3>Total Revenue</h3>
+      <p id="totalRevenue">Loading...</p>
+    </div>
+  </div>
+
+  <h2>📈 Predicted ROI by Budget</h2>
+  <canvas id="roiChart" width="800" height="400"></canvas>
+  
+j
+  <div id="recommendations">
+    <h2>💡 Recommendations</h2>
+    <ul id="recList">Loading...</ul>
+  </div>
+
+  <script>
+    const backendBaseUrl = "http://localhost:8000";
+  
+    function fetchInsights() {
+      fetch(`${backendBaseUrl}/api/insights`)
+        .then(res => res.json())
+        .then(renderInsights)
+        .catch(err => {
+          console.error("Fetch error:", err);
+          document.getElementById('recList').innerHTML =
+            `<li style="color:red">Failed to load insights. Backend may not be running.</li>`;
+        });
+    }
+  
+    function renderInsights(data) {
+      const canvas = document.getElementById('roiChart');
+      if (!canvas) {
+        console.error("Canvas element with ID 'roiChart' not found.");
+        return;
+      }
+  
+      const ctx = canvas.getContext('2d');
+      if (!ctx) {
+        console.error("Unable to get canvas context for Chart.js.");
+        return;
+      }
+  
+      const labels = data.budget_suggestions.map(s => `$${s.spend}`);
+      const values = data.budget_suggestions.map(s => s.predicted_roi);
+  
+      // Create chart if not exists
+      if (typeof window.roiChart === 'undefined') {
+        window.roiChart = new Chart(ctx, {
+          type: 'bar',
+          data: {
+            labels: labels,
+            datasets: [{
+              label: 'Predicted ROI',
+              data: values,
+              backgroundColor: '#4e73df'
+            }]
+          },
+          options: {
+            responsive: true,
+            scales: {
+              y: {
+                beginAtZero: true,
+                title: { display: true, text: 'ROI' }
+              }
+            }
+          }
+        });
+      } else {
+        // Update existing chart
+        window.roiChart.data.labels = labels;
+        window.roiChart.data.datasets[0].data = values;
+        window.roiChart.update();
+      }
+  
+      // Update KPI metrics
+      document.getElementById('totalRoi').textContent = data.roi.toFixed(2);
+      const totalSpend = data.meta_summary.reduce((a, b) => a + b.spend, 0);
+      const totalRevenue = data.shopify_summary.reduce((a, b) => a + b.revenue, 0);
+      document.getElementById('totalSpend').textContent = `$${totalSpend.toFixed(2)}`;
+      document.getElementById('totalRevenue').textContent = `$${totalRevenue.toFixed(2)}`;
+      document.getElementById('recList').innerHTML =
+        data.recommendations.map(r => `<li>${r}</li>`).join('');
+    }
+  
+    setInterval(fetchInsights, 10000); // auto-refresh
+    fetchInsights(); // initial load
+  </script>
+  
+</body>
+</html>
