@@ -11,7 +11,7 @@ try:
     from facebook_business.api import FacebookAdsApi
     from facebook_business.adobjects.adaccount import AdAccount
     from facebook_business.adobjects.adsinsights import AdsInsights
-except ImportError:
+except ImpgortError:
     FacebookAdsApi = None  # fallback
 
 load_dotenv()

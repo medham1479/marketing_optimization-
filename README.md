@@ -1,150 +1,132 @@
-#  AI-Powered Marketing Optimization Dashboard
+# 📈 AI-Powered Marketing Optimization Dashboard
 
-A full-stack analytics platform that helps marketing teams explore ad performance, forecast conversions, and generate AI-based recommendations using simulated Meta Ads and Shopify data. Built with Flask (Python backend) and Chart.js (HTML frontend).
-
----
-
-## Features
-
-### Core Capabilities
-
-- **Ad Performance Analysis**  
-  Analyze impressions, spend, clicks, CTR, and conversions from Meta-style ads.
-
-- **Shopify Integration**  
-  View revenue by product, total revenue, and purchase behavior.
-
-- **Forecasting**  
-  Uses Facebook Prophet to predict future conversions for the next 7 days.
-
-- **A/B Testing**  
-  Automatically compares performance between Variant A (video ad) and Variant B (static ad) using z-tests and CTR trends over time.
-
-- **AI Recommendations**  
-  Automatically provides natural-language strategy suggestions based on ad performance data and trends.
-
-- **Campaign Filtering**  
-  Filter the dashboard by campaign (All, Campaign A, Campaign B) to isolate insights.
-
-- **Live Dashboard**  
-  Auto-refreshing charts and KPIs every 10 seconds for real-time updates.
+This is a proof-of-concept full-stack platform to analyze and optimize Meta Ads + Shopify performance using AI (LLMs), statistical analysis (Z-tests), and time-series forecasting (Prophet). It provides real-time insights, recommendations, and visual dashboards based on ad and ecommerce data.
 
 ---
 
-##  Dashboard Layout (Frontend Overview)
+##  Features
 
-### Campaign Filter
-- Dropdown selector allows filtering by **All**, **Campaign A**, or **Campaign B**.
-- Updates all charts and insights dynamically.
+###  1. Meta Ads + Shopify Integration
+- Pulls **simulated Meta Ads** and **Shopify sales** data.
+- Users can toggle between **mock data** or plug in **real API keys** (Meta Ads & Shopify APIs supported).
+- Meta Ads data includes spend, impressions, clicks, conversions, variants (A/B).
+- Shopify data includes product, sales, revenue, etc.
 
-###  KPI Summary Cards
-- **ROI**: Calculated based on revenue vs spend.
-- **Total Spend**: From ad campaign data.
-- **Total Revenue**: From Shopify data.
+### 2. AI-Powered Recommendations (OpenAI + OpenLLM)
+- Uses **OpenAI GPT-4** (or any LLM via OpenLLM) to analyze ad performance metrics.
+- Generates natural-language recommendations such as:
+  - Which ad creative performs better.
+  - Whether to shift budget.
+  - Suggestions for targeting/landing pages.
 
-### Charts
-
-- **Forecasted Conversions**  
-  Line chart showing the predicted number of conversions for the next 7 days.
-
-- **Revenue by Product**  
-  Bar chart displaying revenue breakdown by each product.
-
-- **CTR Over Time (A/B Test)**  
-  Line chart comparing daily CTRs between Variant A and Variant B.
-
-- **Predictive Budget ROI**  
-  Bar chart showing expected ROI for different budget allocations.
-
-###  A/B Test Results
-- Table of impressions, clicks, conversions, and CTR per variant.
-- Statistical test results (z-test) with interpretation (e.g., significant or not).
-
-###  AI-Powered Recommendations
-- LLM-style text block summarizing suggestions like:
-  - Shift more budget to Campaign A.
-  - Pause Campaign B if underperforming.
-  - Test new creatives if CTR is flat.
-
----
-
-## 🛠️ Getting Started
-
-### 1. Clone the Repo
-
-```bash
-git clone https://github.com/yourusername/marketing-optimizer.git
-cd marketing-optimizer
-```
-
-### 2. Set Up Python Environment
-
-```bash
-python3 -m venv venv
-source venv/bin/activate
-pip install -r requirements.txt
-```
-
-### 3. Run the App
+###  3. Real-Time Web Dashboard (Frontend)
+- Built with **HTML + Chart.js + JS + Docker + Flask backend**.
+- Visualizes:
+  - 📈 Forecasted conversions (7-day Prophet model).
+  -  Revenue by product.
+  -  A/B test results & CTR comparison.
+  - AI recommendations.
+- Auto-refreshes every **10 seconds** to simulate real-time updates.
 
 
-
-```bash
-docker-compose up --build
-```
-
-### 4. Open in Browser
-
-Visit [http://localhost:3000]
-
----
 
 ##  Project Structure
 
 ```
-marketing-optimizer/
-├── backend/
-│   ├── main.py               # Flask server
-│   ├── models/
-│   │   ├── insights.py       # Summarization & metrics
-│   │   ├── forecast.py       # Prophet model
-│   │   ├── ab_test.py        # A/B testing logic
-│   │  
-│   └── services/
-│       ├── meta_ads.py   # Simulated Meta Ads data
-│       └── shopify.py# Simulated Shopify data
-├── frontend/
-│   └── index.html            # Interactive dashboard
+.
+├── main.py                   # Flask backend entry point
+├── meta_ads.py               # Simulated + real Meta Ads data loader
+├── shopify_data.py           # Simulated Shopify sales data
+├── models/
+│   ├── insights.py           # AI + analytics logic for recommendations
+│   ├── forecast.py           # Prophet-based conversion forecasts
+│   └── ab_test.py            # Z-test logic for A/B comparison
+├── static/
+│   └── index.html            # Frontend dashboard (Chart.js, live updates)
+├── Dockerfile + docker-compose.yml
 ├── requirements.txt
-├── Dockerfile
-├── docker-compose.yml
-└── README.md
+└── .env                      # API keys, tokens, etc.
 ```
 
 ---
 
-## 🔌 API Endpoints
+## 🛠️ Setup Instructions
 
-| Endpoint         | Description                            |
-|------------------|----------------------------------------
-| `/api/insights`  | Combined metrics, summaries, AI advice 
-| `/api/forecast`  | 7-day conversion forecast               
-| `/api/abtest`    | CTR + conversions comparison A vs B    
-| `/api/recommendations` | Raw natural language insights     
+1. **Clone and Build:**
+
+```bash
+git clone https://github.com/your-username/ai-marketing-dashboard.git
+cd ai-marketing-dashboard
+docker-compose up --build
+```
+
+2. **Add `.env`:**
+
+```env
+OPENAI_API_KEY=your_openai_key
+SLACK_WEBHOOK=https://hooks.slack.com/your/webhook
+META_ACCESS_TOKEN=optional_meta_access_token
+SHOPIFY_API_KEY=optional_key
+SHOPIFY_PASSWORD=optional_pw
+```
+
+3. **Visit:**  
+Open `http://localhost:3000` in your browser to view the dashboard.
 
 ---
 
-##  Tech Stack
 
-- **Backend**: Python, Flask, pandas, Prophet, statsmodels
-- **Frontend**: HTML, CSS, JavaScript, Chart.js
-- **AI/ML**: Prophet, z-tests, rule-based LLM logic
-- **DevOps**: Docker, docker-compose
+---
+
+## 📈 Dashboard Highlights
+
+| Section                    | What It Shows                                             |
+|----------------------------|-----------------------------------------------------------|
+| KPI Cards                  | Total ROI, Spend, Revenue                                 |
+| Forecasted Conversions     | 7-day prediction via Prophet                              |
+| Shopify Revenue by Product | Bar chart of revenue by product                           |
+| A/B Test Results           | CTR, conversions, impressions for variant A vs B          |
+| AI Recommendations         | Natural-language summary of ad trends and suggestions     |
+| Filters                    | Dropdown to view metrics by campaign (A, B, or All)       |
 
 ---
 
 
 
-Built by Medha Mamidipaka
-mmami@illinois.edu
+---
 
+## Technologies Used
+
+- Flask + Python
+- Prophet (Facebook)
+- OpenAI GPT-4 + OpenLLM
+- Chart.js (Frontend)
+- Docker + Docker Compose
+
+---
+
+##  Security
+
+- API Keys stored securely in `.env`
+- Never committed to version control
+- All external requests sanitized
+
+---
+
+##  Testing
+
+Run:
+
+```bash
+docker-compose exec backend pytest
+```
+
+---
+
+## Notes
+
+- All data is simulated unless real tokens are configured.
+
+
+---
+Created by: Medha Mamidipaka | mmami@illinois.edu
