@@ -5,3 +5,7 @@ scikit-learn
 prophet
 statsmodels
 plotly
+openai==0.28
+facebook_business
+ShopifyAPI
+python-dotenv

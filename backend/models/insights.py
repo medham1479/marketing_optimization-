@@ -1,4 +1,9 @@
+import os
 import pandas as pd
+import openai
+
+
+
 
 def generate_insights(meta_data, shopify_data):
     df = pd.DataFrame(meta_data)
@@ -15,7 +20,7 @@ def generate_insights(meta_data, shopify_data):
         "roi": "mean"
     }).reset_index()
 
-    recommendations = generate_recommendations(summary)
+    recommendations = generate_llm_recommendations(summary)
 
     return {
         "roi": df["roi"].mean(),
@@ -26,37 +31,35 @@ def generate_insights(meta_data, shopify_data):
     }
 
 
-def generate_recommendations(summary_df):
-    recs = []
+def generate_llm_recommendations(summary_df):
+    """
+    Generate natural language marketing recommendations from A/B performance summary using LLM.
+    """
 
+    prompt = f"""
+You are an expert marketing analyst helping a growth team optimize Meta Ads performance. Below is a summary of key metrics from an A/B test for two ad variants:
+
+{summary_df.to_json(orient="records", indent=2)}
+
+Your job is to analyze and interpret this data, and write 3 to 5 concise, high-impact recommendations to improve marketing performance.
+
+Each recommendation should follow these guidelines:
+- Address key metrics (CTR, CPC, conversion rate, ROI)
+- Make clear comparisons between Variant A and Variant B
+- Suggest **specific actions**: e.g., "increase budget for...", "test new creatives...", "pause variant B if..."
+- Use short bullet points (1–2 sentences each)
+- Avoid generic or vague suggestions
+
+Respond only with the bullet points.
+"""
+    openai.api_key = os.getenv("OPENAI_API_KEY")
     try:
-        variant_a = summary_df[summary_df["variant"] == "A"].iloc[0]
-        variant_b = summary_df[summary_df["variant"] == "B"].iloc[0]
-    except IndexError:
-        return ["Insufficient data to compare A/B variants."]
-
-    if variant_a["ctr"] > variant_b["ctr"] * 1.1:
-        recs.append("📈 Variant A has a significantly higher CTR. Prioritize Video Ads.")
-    elif variant_b["ctr"] > variant_a["ctr"] * 1.1:
-        recs.append("📈 Variant B is attracting more clicks. Test Carousel formats more.")
-
-    if variant_a["roi"] > variant_b["roi"] * 1.2:
-        recs.append("💰 Variant A has much better ROI. Allocate more spend to Campaign A.")
-    elif variant_b["roi"] > variant_a["roi"] * 1.2:
-        recs.append("💰 Variant B has better ROI. Shift budget to Campaign B.")
-
-    if variant_a["cpc"] < variant_b["cpc"]:
-        recs.append("🧾 CPC is lower for Variant A — it's more efficient at driving clicks.")
-    elif variant_b["cpc"] < variant_a["cpc"]:
-        recs.append("🧾 CPC is lower for Variant B — optimize creatives for better cost control.")
-
-    if variant_a["conversion_rate"] > variant_b["conversion_rate"] * 1.1:
-        recs.append("⚡ Variant A converts better — target similar audiences.")
-    elif variant_b["conversion_rate"] > variant_a["conversion_rate"] * 1.1:
-        recs.append("⚡ Variant B is converting better — optimize landing pages accordingly.")
-
-    if not recs:
-        recs.append("🔄 Performance is similar between A and B. Continue monitoring.")
-
-    return recs
-
+        response = openai.ChatCompletion.create(
+         model= "gpt-3.5-turbo",
+        messages=[{"role": "user", "content": prompt}]
+)
+        raw = response['choices'][0]['message']['content']
+        lines = [line.strip("-• ") for line in raw.strip().split("\n") if line.strip()]
+        return lines[:5] if lines else ["⚠️ No insights generated."]
+    except Exception as e:
+        return [f"LLM error: {e}"]

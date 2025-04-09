@@ -1,4 +1,4 @@
-from flask import Flask, jsonify
+from flask import Flask, jsonify, request
 from flask_cors import CORS
 from services.meta_ads import get_meta_ads_data
 from services.shopify import get_shopify_data
@@ -18,10 +18,24 @@ def insights():
 
 @app.route("/api/forecast")
 def forecast():
-    meta_data = get_meta_ads_data()
-    result = generate_forecast(meta_data)
-    return jsonify(result)
+    try:
+        campaign = request.args.get("campaign", "all")
+        data = get_meta_ads_data()
 
+        # Filter by campaign if applicable
+        if campaign != "all":
+            data = [d for d in data if d["campaign"] == campaign]
+
+        forecast_data = generate_forecast(data)
+
+        if not forecast_data:
+            return jsonify({"error": "No data available to forecast."}), 400
+
+        return jsonify(forecast_data)
+    except Exception as e:
+        print("❌ Forecast Error:", e)
+        return jsonify({"error": str(e)}), 500
+    
 @app.route("/api/abtest")
 def abtest():
     meta_data = get_meta_ads_data()
