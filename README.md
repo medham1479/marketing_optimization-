@@ -55,8 +55,8 @@ This is a proof-of-concept full-stack platform to analyze and optimize Meta Ads 
 1. **Clone and Build:**
 
 ```bash
-git clone https://github.com/your-username/ai-marketing-dashboard.git
-cd ai-marketing-dashboard
+git clone https://github.com/your-username/marketing_optimization.git
+cd marketing_optimization
 docker-compose up --build
 ```
 
@@ -64,7 +64,6 @@ docker-compose up --build
 
 ```env
 OPENAI_API_KEY=your_openai_key
-SLACK_WEBHOOK=https://hooks.slack.com/your/webhook
 META_ACCESS_TOKEN=optional_meta_access_token
 SHOPIFY_API_KEY=optional_key
 SHOPIFY_PASSWORD=optional_pw
