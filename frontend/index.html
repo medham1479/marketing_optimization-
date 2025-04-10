@@ -107,7 +107,7 @@
     <summary><strong>📘 Campaign Details</strong></summary>
     <p><strong>Campaign A</strong>: Running Shoes</p>
     <p><strong>Campaign B</strong>: Winter Boots</p>
-    <p>Ad Types: Variant A = 🎥 Video Ad, Variant B = 🖼️ Static/Carousel Ad</p>
+    <p>Ad Types: Variant A = Video Ad, Variant B = Static/Carousel Ad</p>
   </details>
 
   <div class="section">
@@ -259,12 +259,12 @@
         .then(data => {
           let html = "";
           if (!data || !data.variant_stats || !Array.isArray(data.variant_stats)) {
-            html = "❌ No A/B test data available.";
+            html = " No A/B test data available.";
           } else {
             data.variant_stats.forEach(v => {
-              const adType = v.variant === "A" ? "🎥 Video Ad" : (campaign === "Campaign B" ? "🖼️ Carousel Ad" : "🖼️ Static Image");
+              const adType = v.variant === "A" ? "🎥 Video Ad" : (campaign === "Campaign B" ? " Carousel Ad" : "Static Image");
               html += `
-🧪 Variant ${v.variant}
+ Variant ${v.variant}
 - Format: ${adType}
 - Impressions: ${v.impressions}
 - Clicks: ${v.clicks}
@@ -277,7 +277,7 @@
           document.getElementById("abTestResults").textContent = html;
         })
         .catch(() => {
-          document.getElementById("abTestResults").textContent = "❌ Error loading A/B test results.";
+          document.getElementById("abTestResults").textContent = " Error loading A/B test results.";
         });
     }
 

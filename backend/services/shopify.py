@@ -15,8 +15,7 @@ load_dotenv()
 
 SHOPIFY_API_KEY = os.getenv("SHOPIFY_API_KEY")
 SHOPIFY_PASSWORD = os.getenv("SHOPIFY_PASSWORD")
-SHOPIFY_STORE = os.getenv("SHOPIFY_STORE_NAME")  # like mystore.myshopify.com
-
+SHOPIFY_STORE = os.getenv("SHOPIFY_STORE_NAME")  
 def get_shopify_data():
     """
     Returns real data if credentials are present, else returns mock.
@@ -41,7 +40,7 @@ def get_shopify_data():
         return [{"product": k, "revenue": v, "sales": int(v // 100)} for k, v in summary.items()]
 
     except Exception as e:
-        print(f"❌ Shopify API error: {e}")
+        print(f"Shopify API error: {e}")
         return get_shopify_data()
 
 def get_shopify_data():

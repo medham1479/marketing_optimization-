@@ -7,7 +7,7 @@ def generate_forecast(meta_data):
     if "date" not in df.columns or "conversions" not in df.columns:
         return []
 
-    # Aggregate by day
+    # by day
     daily = df.groupby("date").sum(numeric_only=True).reset_index()[["date", "conversions"]]
     daily.columns = ["ds", "y"]
     daily["ds"] = pd.to_datetime(daily["ds"])

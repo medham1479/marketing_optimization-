@@ -22,7 +22,7 @@ This is a proof-of-concept full-stack platform to analyze and optimize Meta Ads 
 ###  3. Real-Time Web Dashboard (Frontend)
 - Built with **HTML + Chart.js + JS + Docker + Flask backend**.
 - Visualizes:
-  - 📈 Forecasted conversions (7-day Prophet model).
+  -  Forecasted conversions (7-day Prophet model).
   -  Revenue by product.
   -  A/B test results & CTR comparison.
   - AI recommendations.
@@ -50,7 +50,7 @@ This is a proof-of-concept full-stack platform to analyze and optimize Meta Ads 
 
 ---
 
-## 🛠️ Setup Instructions
+##  Setup Instructions
 
 1. **Clone and Build:**
 
@@ -90,7 +90,54 @@ Open `http://localhost:3000` in your browser to view the dashboard.
 
 ---
 
+## Technical Architecture
 
+This platform follows a modular, full-stack architecture with machine learning, AI-powered data simulation, backend logic, and frontend visualization:
+
+
+                        +------------------------------+
+                        |    Meta Ads (Real API)       |
+                        |        or                    |
+                        |  🤖 AI-Generated Meta Data    |
+                        |  (via OpenAI/OpenLLM)        |
+                        +--------------+---------------+
+                                       |
+                                       v
+                        +------------------------------+
+                        |        Backend (Flask)        |
+                        |  - /api/insights              |
+                        |  - /api/abtest                |
+                        |  - /api/forecast              |
+                        +--------------+---------------+
+                                       |
+         +-----------------------------+------------------------------+
+         |                                                            |
+         v                                                            v
++-----------------------------+                        +-----------------------------+
+|     AI/ML Services         |                        |     Shopify API/Meta API (or|
+| - Forecasting (Prophet)     |                        |     AI-generated Data)      |
+| - A/B Testing (Z-Test)      |                        +-----------------------------+
+| - Insights + Recommendations|
+|   (Open AI)                  |
++--------------+--------------+
+               |
+               v
++---------------------------------------------------+
+|   Frontend (HTML/CSS/JS + Chart.js)               |
+| - KPI Cards                                       |
+| - Forecasted Conversions Chart                    |
+| - Revenue by Product Chart                        |
+| - A/B Test Results (with CTR/Spend metrics)       |
+| - AI-Generated Recommendations                    |
+| - Campaign Filter Dropdown                        |
++---------------------------------------------------+
+
+```
+
+- **Meta Ads AI Layer**: If no API key is present, the system uses OpenAI/OpenLLM to generate realistic ad performance data (impressions, clicks, spend, CTR, etc.).
+- **AI Integration**: All major decisions (recommendations, data simulation) are powered by LLMs for smarter automation.
+- **Modular Backend**: Flask handles all routing and data processing, dynamically using real or simulated data.
+- **Frontend Dashboard**: Real-time charts and insights update every 10s for a live view of marketing performance.
 
 ---
 
@@ -98,7 +145,7 @@ Open `http://localhost:3000` in your browser to view the dashboard.
 
 - Flask + Python
 - Prophet (Facebook)
-- OpenAI GPT-4 + OpenLLM
+- OpenAI GPT-3.5 + OpenLLM
 - Chart.js (Frontend)
 - Docker + Docker Compose
 

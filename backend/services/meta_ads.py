@@ -6,7 +6,7 @@ from dotenv import load_dotenv
 from datetime import datetime, timedelta
 
 
-# Try importing Meta Ads SDK
+
 try:
     from facebook_business.api import FacebookAdsApi
     from facebook_business.adobjects.adaccount import AdAccount
@@ -64,7 +64,7 @@ def get_mock_meta_ads_data():
 
     data = []
 
-    for i in range(30):  # last 30 days
+    for i in range(30):  
         date = (today - timedelta(days=i)).strftime("%Y-%m-%d")
         for campaign in campaigns:
             for variant in variants:
