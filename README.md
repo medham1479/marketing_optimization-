@@ -94,11 +94,11 @@ Open `http://localhost:3000` in your browser to view the dashboard.
 
 This platform follows a modular, full-stack architecture with machine learning, AI-powered data simulation, backend logic, and frontend visualization:
 
-
+```plaintext
                         +------------------------------+
                         |    Meta Ads (Real API)       |
                         |        or                    |
-                        |  🤖 AI-Generated Meta Data    |
+                        |  AI-Generated Meta Data    |
                         |  (via OpenAI/OpenLLM)        |
                         +--------------+---------------+
                                        |
@@ -114,11 +114,11 @@ This platform follows a modular, full-stack architecture with machine learning, 
          |                                                            |
          v                                                            v
 +-----------------------------+                        +-----------------------------+
-|     AI/ML Services         |                        |     Shopify API/Meta API (or|
+|    AI/ML Services         |                        |     Shopify API + Meta API (or |
 | - Forecasting (Prophet)     |                        |     AI-generated Data)      |
 | - A/B Testing (Z-Test)      |                        +-----------------------------+
 | - Insights + Recommendations|
-|   (Open AI)                  |
+|   via OpenAI/OpenLLM        |
 +--------------+--------------+
                |
                v
@@ -139,7 +139,9 @@ This platform follows a modular, full-stack architecture with machine learning, 
 - **Modular Backend**: Flask handles all routing and data processing, dynamically using real or simulated data.
 - **Frontend Dashboard**: Real-time charts and insights update every 10s for a live view of marketing performance.
 
----
+
+
+-----
 
 ## Technologies Used
 
