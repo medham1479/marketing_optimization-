@@ -262,7 +262,7 @@
             html = " No A/B test data available.";
           } else {
             data.variant_stats.forEach(v => {
-              const adType = v.variant === "A" ? "🎥 Video Ad" : (campaign === "Campaign B" ? " Carousel Ad" : "Static Image");
+              const adType = v.variant === "A" ? " Video Ad" : (campaign === "Campaign B" ? " Carousel Ad" : "Static Image");
               html += `
  Variant ${v.variant}
 - Format: ${adType}
@@ -272,7 +272,7 @@
 - CTR: ${(v.ctr * 100).toFixed(1)}%
 - Spend: $${v.spend.toFixed(2)}\n\n`;
             });
-            html += `💡 Interpretation: ${data.interpretation}`;
+            html += ` Interpretation: ${data.interpretation}`;
           }
           document.getElementById("abTestResults").textContent = html;
         })
